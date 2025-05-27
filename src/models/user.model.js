@@ -59,8 +59,8 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.isComparePassword = async function (password) {
-  return await brcypt.compare(this.password, password);
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await brcypt.compare(password, this.password);
 };
 
 userSchema.methods.generateAccessTokens = function () {
