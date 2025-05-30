@@ -225,6 +225,8 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
+
+  
   const users = await User.find({}).select("-password -refreshToken");
 
   if (!users) {
@@ -270,6 +272,34 @@ const updateCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
+const updateUserAvatar = asyncHandler(async (req, res) => {
+  const avatarLocalPath = req.file?.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(401, "Avatar File is required");
+  }
+
+  const avatar = uploadOnCloudinary(avatarLocalPath);
+
+  if (!avatar) {
+    throw new ApiError(401, "Something getting wrong while uploading avatar");
+  }
+
+  const updateAvatar = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar:  avatar.url
+      },
+    },
+    {
+      new: true,
+    }
+  ).select("-password");
+
+  return res.status(201).json(new ApiResponse(200,  updateAvatar, "Avatar Updated Successfully"));
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -279,4 +309,5 @@ module.exports = {
   getAllUsers,
   getCurrentUser,
   updateCurrentUser,
+  updateUserAvatar,
 };

@@ -15,8 +15,10 @@ app.use(express.json({ limit: "16kb" }));
 app.use(cookieParser());
 
 const userRouter = require("./routes/user.routes.js");
+const connectionRouter = require("./routes/connection.routes.js");
 
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/connections", connectionRouter);
 
 
 module.exports = app;

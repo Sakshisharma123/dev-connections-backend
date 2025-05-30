@@ -8,6 +8,7 @@ const {
   getAllUsers,
   getCurrentUser,
   updateCurrentUser,
+  updateUserAvatar,
 } = require("../controllers/user.controller");
 const upload = require("../middlewares/multer.middleware");
 const verifyJwt = require("../middlewares/auth.middleware");
@@ -28,5 +29,6 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/reset-password").post(changeCurrentPassword);
 router.route("/feed").get(getAllUsers);
 router.route("/details/:id").get(getCurrentUser).put(updateCurrentUser);
+router.route("/avatar").patch(verifyJwt, upload.single("avatar"), updateUserAvatar)
 
 module.exports = router;
