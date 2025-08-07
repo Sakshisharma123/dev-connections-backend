@@ -27,8 +27,14 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password, age, gender, about, skills } =
+  const { firstName, lastName, email, password, age, gender, about} =
     req.body;
+
+  const skills = JSON.parse(req.body.skills); 
+
+  if (!Array.isArray(skills)) {
+    throw new ApiError(400, "Skills must be an array");
+  }
 
   if (!firstName) {
     throw new ApiError(401, "Enter a valid First name ");
@@ -225,8 +231,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {
-
-  
   const users = await User.find({}).select("-password -refreshToken");
 
   if (!users) {
@@ -289,7 +293,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     req.user._id,
     {
       $set: {
-        avatar:  avatar.url
+        avatar: avatar.url,
       },
     },
     {
@@ -297,7 +301,9 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     }
   ).select("-password");
 
-  return res.status(201).json(new ApiResponse(200,  updateAvatar, "Avatar Updated Successfully"));
+  return res
+    .status(201)
+    .json(new ApiResponse(200, updateAvatar, "Avatar Updated Successfully"));
 });
 
 module.exports = {

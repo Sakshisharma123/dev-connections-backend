@@ -29,6 +29,7 @@ connectionRequestSchema.pre("save", async function (next) {
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
     throw new Error("You can not send connection request to yourself");
   }
+  
   next();
 });
 
