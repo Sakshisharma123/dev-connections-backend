@@ -9,12 +9,10 @@ const jwt = require("jsonwebtoken");
 const generateAccessAndRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
-
     const accessToken = user.generateAccessTokens();
     const refreshToken = user.generateRefreshTokens();
 
     user.refreshToken = refreshToken;
-
     await user.save({ validateBeforeSave: true });
 
     return { accessToken, refreshToken };
@@ -27,10 +25,9 @@ const generateAccessAndRefreshToken = async (userId) => {
 };
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { firstName, lastName, email, password, age, gender, about} =
-    req.body;
+  const { firstName, lastName, email, password, age, gender, about } = req.body;
 
-  const skills = JSON.parse(req.body.skills); 
+  const skills = JSON.parse(req.body.skills);
 
   if (!Array.isArray(skills)) {
     throw new ApiError(400, "Skills must be an array");
@@ -45,21 +42,18 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const existedUser = await User.findOne({ email });
-
   if (existedUser) {
     throw new ApiError(409, "User already existed with this email");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
   if (!avatarLocalPath) {
-    throw new ApiError(409, "Avatar File is required");
+    throw new ApiError(409, "Profile Image is required");
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
-
   if (!avatar) {
-    throw new ApiError(409, "Avatar File is required");
+    throw new ApiError(409, "Profile Image is required");
   }
 
   const user = await User.create({
@@ -77,7 +71,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const createdUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-
   if (!createdUser) {
     throw new ApiError(409, "Something went wrong while registering the user");
   }
@@ -89,19 +82,16 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   if (!email) {
     throw new ApiError(401, "Email is required");
   }
 
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new ApiError(409, "User does not exist");
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
-
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user Credentials");
   }
@@ -113,7 +103,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-
   if (!loggedInUser) {
     throw new ApiError(409, "Something went wrong while Logged in the user");
   }
@@ -176,7 +165,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     );
 
     const user = await User.findById(decodedToken?._id);
-
     if (!user) {
       throw new ApiError(401, "Invalid refresh token");
     }
@@ -217,7 +205,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findOne({ email });
-
   if (!user) {
     throw new ApiError(401, "User does not exist with this email");
   }
@@ -232,7 +219,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
 const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}).select("-password -refreshToken");
-
   if (!users) {
     throw new ApiError(401, "Users not Found");
   }
@@ -244,7 +230,6 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   const userId = req.params.id;
 
   const user = await User.findById(userId).select("-password -refreshToken");
-
   if (!user) {
     throw new ApiError(401, "User not Found");
   }
@@ -284,7 +269,6 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   }
 
   const avatar = uploadOnCloudinary(avatarLocalPath);
-
   if (!avatar) {
     throw new ApiError(401, "Something getting wrong while uploading avatar");
   }
