@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
       enum: ["male", "female", "others"],
       required: [true, "Gender is required"],
     },
-    avatar: {
+    profileImage: {
       type: String,
       required: true,
     },

@@ -8,7 +8,7 @@ const {
   getAllUsers,
   getCurrentUser,
   updateCurrentUser,
-  updateUserAvatar,
+  updateUserProfileImage,
 } = require("../controllers/user.controller");
 const upload = require("../middlewares/multer.middleware");
 const verifyJwt = require("../middlewares/auth.middleware");
@@ -17,7 +17,7 @@ const router = express.Router();
 router.route("/register").post(
   upload.fields([
     {
-      name: "avatar",
+      name: "profileImage",
       maxCount: 1,
     },
   ]),
@@ -29,6 +29,6 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/reset-password").post(changeCurrentPassword);
 router.route("/feed").get(getAllUsers);
 router.route("/details/:id").get(getCurrentUser).put(updateCurrentUser);
-router.route("/avatar").patch(verifyJwt, upload.single("avatar"), updateUserAvatar)
+router.route("/profile-image").patch(verifyJwt, upload.single("avatar"), updateUserProfileImage)
 
 module.exports = router;

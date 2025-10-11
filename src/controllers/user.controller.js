@@ -46,13 +46,13 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User already existed with this email");
   }
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const profileImageLocalPath = req.files?.profileImage?.[0]?.path;
   if (!avatarLocalPath) {
     throw new ApiError(409, "Profile Image is required");
   }
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
-  if (!avatar) {
+  const profileImage = await uploadOnCloudinary(profileImageLocalPath);
+  if (!profileImage) {
     throw new ApiError(409, "Profile Image is required");
   }
 
@@ -65,7 +65,7 @@ const registerUser = asyncHandler(async (req, res) => {
     gender,
     about,
     skills,
-    avatar: avatar.url,
+    profileImage: profileImage.url,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -261,23 +261,23 @@ const updateCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
-const updateUserAvatar = asyncHandler(async (req, res) => {
-  const avatarLocalPath = req.file?.path;
+const updateUserProfileImage= asyncHandler(async (req, res) => {
+  const profileImageLocalPath = req.file?.path;
 
-  if (!avatarLocalPath) {
-    throw new ApiError(401, "Avatar File is required");
+  if (!profileImageLocalPath) {
+    throw new ApiError(401, "Profile Image is required");
   }
 
-  const avatar = uploadOnCloudinary(avatarLocalPath);
-  if (!avatar) {
-    throw new ApiError(401, "Something getting wrong while uploading avatar");
+  const profileImage = uploadOnCloudinary(profileImageLocalPath);
+  if (!profileImage) {
+    throw new ApiError(401, "Something getting wrong while uploading profile image");
   }
 
-  const updateAvatar = await User.findByIdAndUpdate(
+  const updateProfileImage = await User.findByIdAndUpdate(
     req.user._id,
     {
       $set: {
-        avatar: avatar.url,
+        profileImage: profileImage.url,
       },
     },
     {
@@ -287,7 +287,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(200, updateAvatar, "Avatar Updated Successfully"));
+    .json(new ApiResponse(200, updateProfileImage, "Profile Image Updated Successfully"));
 });
 
 module.exports = {
@@ -299,5 +299,5 @@ module.exports = {
   getAllUsers,
   getCurrentUser,
   updateCurrentUser,
-  updateUserAvatar,
+  updateUserProfileImage,
 };
