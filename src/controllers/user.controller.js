@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const profileImageLocalPath = req.files?.profileImage?.[0]?.path;
-  if (!avatarLocalPath) {
+  if (!profileImageLocalPath) {
     throw new ApiError(409, "Profile Image is required");
   }
 
@@ -110,6 +110,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
   };
 
   return res
@@ -141,6 +142,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "none",
   };
 
   return res
@@ -176,6 +178,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const options = {
       httpOnly: true,
       secure: true,
+      sameSite: "none",
     };
 
     const { accessToken, newRefreshToken } =
@@ -261,7 +264,7 @@ const updateCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
-const updateUserProfileImage= asyncHandler(async (req, res) => {
+const updateUserProfileImage = asyncHandler(async (req, res) => {
   const profileImageLocalPath = req.file?.path;
 
   if (!profileImageLocalPath) {
@@ -270,7 +273,10 @@ const updateUserProfileImage= asyncHandler(async (req, res) => {
 
   const profileImage = uploadOnCloudinary(profileImageLocalPath);
   if (!profileImage) {
-    throw new ApiError(401, "Something getting wrong while uploading profile image");
+    throw new ApiError(
+      401,
+      "Something getting wrong while uploading profile image"
+    );
   }
 
   const updateProfileImage = await User.findByIdAndUpdate(
@@ -287,7 +293,13 @@ const updateUserProfileImage= asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(200, updateProfileImage, "Profile Image Updated Successfully"));
+    .json(
+      new ApiResponse(
+        200,
+        updateProfileImage,
+        "Profile Image Updated Successfully"
+      )
+    );
 });
 
 module.exports = {
